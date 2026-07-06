@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2027 Family Week Poll</title>
+<title>Summer 2027 Family Week Poll</title>
 <style>
   :root {
     --bg: #f6f7fb;
@@ -43,16 +43,17 @@
     color: var(--ink);
     line-height: 1.5;
   }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
-  header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { margin: 0 0 4px; font-size: 1.5rem; }
   header p { margin: 0 0 20px; color: var(--muted); }
 
-  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-  .tab {
-    padding: 10px 18px; border: 1px solid var(--line); border-radius: 10px;
-    background: var(--card); color: var(--ink); font-size: 1rem; cursor: pointer;
+  .steps { display: flex; gap: 6px; margin-bottom: 20px; }
+  .step {
+    flex: 1; text-align: center; font-size: .82rem; color: var(--muted);
+    padding: 8px 4px; border-bottom: 3px solid var(--line);
   }
-  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .step.active { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .step.done { color: var(--good); border-color: var(--good); }
 
   .card {
     background: var(--card); border: 1px solid var(--line); border-radius: 14px;
@@ -62,8 +63,8 @@
 
   label.field-label { display: block; font-weight: 600; margin-bottom: 6px; }
   input[type="text"], textarea {
-    width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
-    background: var(--bg); color: var(--ink); font-size: 1rem; font-family: inherit;
+    width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg); color: var(--ink); font-size: 1.05rem; font-family: inherit;
   }
   textarea { min-height: 90px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85rem; }
 
@@ -71,42 +72,49 @@
   .toolbar .count { margin-left: auto; color: var(--muted); font-size: .9rem; }
 
   button.btn {
-    padding: 9px 16px; border-radius: 8px; border: 1px solid var(--line);
-    background: var(--card); color: var(--ink); font-size: .95rem; cursor: pointer;
+    padding: 11px 18px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--card); color: var(--ink); font-size: 1rem; cursor: pointer;
   }
   button.btn:hover { border-color: var(--accent); }
   button.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  button.btn.big { width: 100%; padding: 14px; font-size: 1.05rem; }
   button.btn.danger { color: #dc2626; }
 
-  .month-group { margin-bottom: 4px; }
   .month-group h3 {
     font-size: .8rem; text-transform: uppercase; letter-spacing: .06em;
     color: var(--muted); margin: 16px 0 8px;
   }
-  .weeks { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+  .weeks { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
   .week {
-    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 10px; padding: 12px;
     border: 1px solid var(--line); border-radius: 10px; cursor: pointer;
     background: var(--bg); user-select: none;
   }
   .week:hover { border-color: var(--accent); }
-  .week input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .week input { width: 19px; height: 19px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
   .week.checked { background: var(--accent-soft); border-color: var(--accent); }
-  .week .wk-label { font-size: .93rem; }
+  .week .wk-label { font-size: .95rem; }
 
-  .result-box {
-    background: var(--bg); border: 1px dashed var(--accent); border-radius: 10px;
-    padding: 14px; margin-top: 14px;
-  }
   .code {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: .85rem; word-break: break-all; background: var(--card);
+    font-size: .85rem; word-break: break-all; background: var(--bg);
     border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin: 8px 0;
   }
   .hidden { display: none; }
   .hint { color: var(--muted); font-size: .88rem; }
+  .picked-list { margin: 8px 0 0; padding-left: 20px; }
+  .picked-list li { margin: 2px 0; }
 
-  /* Results */
+  .banner-ok {
+    padding: 14px 16px; border-radius: 10px; background: var(--good-soft);
+    border: 1px solid var(--good); margin-bottom: 16px; font-size: .95rem;
+  }
+  .banner-warn {
+    padding: 14px 16px; border-radius: 10px; background: var(--warn-soft);
+    border: 1px solid var(--warn); margin-bottom: 16px; font-size: .95rem;
+  }
+
+  /* Admin */
   .fam-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
   .chip {
     display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px;
@@ -120,71 +128,92 @@
   th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
   tr.all-avail td { background: var(--good-soft); }
   tr.most-avail td { background: var(--warn-soft); }
-  .badge {
-    display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600;
-  }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600; }
   .badge.all { background: var(--good); color: #fff; }
   .badge.most { background: var(--warn); color: #fff; }
   .badge.some { background: var(--bad-soft); color: var(--muted); }
-  .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; min-width: 80px; }
+  .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; min-width: 70px; }
   .bar > div { height: 100%; background: var(--accent); }
-  .best-banner {
-    padding: 14px 16px; border-radius: 10px; background: var(--good-soft);
-    border: 1px solid var(--good); margin-bottom: 16px; font-size: .95rem;
-  }
+
+  footer { text-align: center; margin-top: 32px; }
+  footer a { color: var(--muted); font-size: .8rem; text-decoration: none; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>🗓️ 2027 Family Week Poll</h1>
-    <p>Pick every week in 2027 that works for your family, then submit. We'll find the weeks that work for everyone.</p>
+    <h1>☀️ Summer 2027 Family Week Poll</h1>
+    <p id="subtitle">Help us find the week that works for everyone — June, July &amp; August 2027.</p>
   </header>
 
-  <div class="tabs">
-    <button class="tab active" id="tabPoll" onclick="showTab('poll')">✅ Fill Out Poll</button>
-    <button class="tab" id="tabResults" onclick="showTab('results')">📊 View Results</button>
+  <div class="steps" id="stepBar">
+    <div class="step" id="step1">1. Your family</div>
+    <div class="step" id="step2">2. Pick weeks</div>
+    <div class="step" id="step3">3. Send it in</div>
   </div>
 
-  <!-- ===================== POLL VIEW ===================== -->
-  <section id="pollView">
+  <!-- ============ STEP 1: NAME ============ -->
+  <section id="nameView" class="hidden">
     <div class="card">
-      <label class="field-label" for="familyName">Your family name</label>
-      <input type="text" id="familyName" placeholder="e.g. The Hannas" maxlength="40">
+      <h2>Welcome! Who's filling this out?</h2>
+      <label class="field-label" for="familyName">Family name</label>
+      <input type="text" id="familyName" placeholder="e.g. The Hannas" maxlength="40"
+             onkeydown="if(event.key==='Enter')continueToWeeks()">
+      <div class="toolbar" style="margin-top:16px">
+        <button class="btn primary big" onclick="continueToWeeks()">Continue →</button>
+      </div>
     </div>
+  </section>
 
+  <!-- ============ STEP 2: WEEKS ============ -->
+  <section id="weeksView" class="hidden">
     <div class="card">
-      <h2>Which weeks work for you?</h2>
-      <p class="hint">Each option is a full week starting on the Monday shown.</p>
+      <h2 id="weeksHeading">Which weeks work for your family?</h2>
+      <p class="hint">Check every week that works. Each option is a full week starting on the Monday shown.</p>
       <div class="toolbar">
         <button class="btn" onclick="setAll(true)">Select all</button>
         <button class="btn" onclick="setAll(false)">Clear all</button>
         <span class="count" id="checkedCount">0 weeks selected</span>
       </div>
       <div id="weekList"></div>
-    </div>
-
-    <div class="card">
-      <button class="btn primary" onclick="submitPoll()">Submit my availability</button>
-      <div class="result-box hidden" id="submitResult">
-        <strong>✅ Thanks! One last step — send this back to the organizer.</strong>
-        <p class="hint">Your availability is packed into the code below. Use one of the buttons, or just copy the code into any message.</p>
-        <div class="code" id="responseCode"></div>
-        <div class="toolbar">
-          <button class="btn primary" onclick="emailResponse()">📧 Email it</button>
-          <button class="btn" onclick="copyText(document.getElementById('responseCode').textContent, this)">📋 Copy code</button>
-          <button class="btn" onclick="copyShareLink(this)">🔗 Copy results link</button>
-        </div>
+      <div class="toolbar" style="margin-top:16px">
+        <button class="btn" onclick="showView('name')">← Back</button>
+        <button class="btn primary" style="flex:1" onclick="submitPoll()">Submit my availability →</button>
       </div>
     </div>
   </section>
 
-  <!-- ===================== RESULTS VIEW ===================== -->
-  <section id="resultsView" class="hidden">
+  <!-- ============ STEP 3: DONE ============ -->
+  <section id="doneView" class="hidden">
     <div class="card">
-      <h2>Add family responses</h2>
-      <p class="hint">Paste the response codes families sent you — one per line — then click Add. Responses are saved in this browser.</p>
-      <textarea id="codeInput" placeholder="F27:The%20Hannas:0f00c0000001aa"></textarea>
+      <h2 id="doneHeading">✅ Thanks!</h2>
+      <div class="banner-ok">
+        <strong>One last step:</strong> send your response to the organizer using the button below.
+      </div>
+      <button class="btn primary big" onclick="emailResponse()">📧 Email my response to the organizer</button>
+      <p class="hint" style="margin-top:10px">If email doesn't open on your device, copy this instead and text or message it over:</p>
+      <div class="code" id="responseCode"></div>
+      <div class="toolbar">
+        <button class="btn" onclick="copyText(shareLink(), this)">🔗 Copy my response link</button>
+        <button class="btn" onclick="copyText(document.getElementById('responseCode').textContent, this)">📋 Copy code</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Your selected weeks</h2>
+      <ul class="picked-list" id="pickedList"></ul>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn big" onclick="showView('weeks')">✏️ Make adjustments</button>
+      </div>
+      <p class="hint">Changed your mind? Adjust your weeks and submit again — just send the new response to the organizer and it will replace your old one.</p>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section id="adminView" class="hidden">
+    <div class="card">
+      <h2>🛠️ Organizer dashboard</h2>
+      <p class="hint">Family responses arrive as links or codes. Opening a family's response link on this device imports it automatically — or paste codes below, one per line. Everything is saved in this browser.</p>
+      <textarea id="codeInput" placeholder="F27S:The%20Hannas:1f30"></textarea>
       <div class="toolbar">
         <button class="btn primary" onclick="importCodes()">Add responses</button>
         <button class="btn danger" onclick="clearResponses()">Clear all responses</button>
@@ -198,10 +227,10 @@
     </div>
 
     <div class="card">
-      <h2>Week-by-week availability</h2>
+      <h2>Mutually available weeks</h2>
       <div id="bestBanner"></div>
       <div class="toolbar">
-        <label><input type="checkbox" id="sortByCount" onchange="renderResults()"> Sort by most available</label>
+        <label><input type="checkbox" id="sortByCount" onchange="renderAdmin()"> Sort by most available</label>
       </div>
       <div class="table-scroll">
         <table>
@@ -212,26 +241,34 @@
         </table>
       </div>
     </div>
+    <div class="toolbar">
+      <button class="btn" onclick="location.hash=''; showView(myResponse().submitted ? 'done' : 'name')">← Back to the poll</button>
+    </div>
   </section>
+
+  <footer><a href="#admin" onclick="showView('admin')">organizer view</a></footer>
 </div>
 
 <script>
 "use strict";
 
 // ============ CONFIG ============
-const ORGANIZER_EMAIL = "kylehanna33@gmail.com"; // where families email their response codes
+const ORGANIZER_EMAIL = "kylehanna33@gmail.com"; // where families send their responses
 const YEAR = 2027;
-const CODE_PREFIX = "F27";
-const STORAGE_KEY = "familyPollResponses2027";
+const MONTHS = [5, 6, 7];        // 0-based: June, July, August
+const CODE_PREFIX = "F27S";      // "S" = summer; also invalidates codes from older versions
+const ADMIN_STORAGE_KEY = "familyPollAdmin2027s";
+const FAMILY_STORAGE_KEY = "familyPollMine2027s";
+const TOTAL_FAMILIES = 10;
 
 // ============ WEEK GENERATION ============
-// All Mondays in 2027.
+// All Mondays in June–August of YEAR.
 function buildWeeks() {
   const weeks = [];
   const d = new Date(YEAR, 0, 1);
-  while (d.getDay() !== 1) d.setDate(d.getDate() + 1); // advance to first Monday
+  while (d.getDay() !== 1) d.setDate(d.getDate() + 1);
   while (d.getFullYear() === YEAR) {
-    weeks.push(new Date(d));
+    if (MONTHS.includes(d.getMonth())) weeks.push(new Date(d));
     d.setDate(d.getDate() + 7);
   }
   return weeks;
@@ -239,11 +276,52 @@ function buildWeeks() {
 const WEEKS = buildWeeks();
 
 const fmtLong = new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
-const fmtShort = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric" });
+const fmtShort = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
 const fmtMonth = new Intl.DateTimeFormat("en-US", { month: "long" });
 
-// ============ POLL VIEW ============
-function renderPoll() {
+// ============ FAMILY STATE (this device) ============
+function myResponse() {
+  try { return JSON.parse(localStorage.getItem(FAMILY_STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveMyResponse(patch) {
+  const cur = { name: "", indices: [], submitted: false, ...myResponse(), ...patch };
+  localStorage.setItem(FAMILY_STORAGE_KEY, JSON.stringify(cur));
+  return cur;
+}
+
+// ============ VIEWS ============
+const VIEWS = ["name", "weeks", "done", "admin"];
+function showView(which) {
+  VIEWS.forEach(v => document.getElementById(v + "View").classList.toggle("hidden", v !== which));
+  const isAdmin = which === "admin";
+  document.getElementById("stepBar").classList.toggle("hidden", isAdmin);
+  document.getElementById("subtitle").textContent = isAdmin
+    ? "See every family's response and the weeks that work for everyone."
+    : "Help us find the week that works for everyone — June, July & August 2027.";
+  const stepIdx = { name: 1, weeks: 2, done: 3 }[which] || 0;
+  [1, 2, 3].forEach(n => {
+    const el = document.getElementById("step" + n);
+    el.classList.toggle("active", n === stepIdx);
+    el.classList.toggle("done", n < stepIdx);
+  });
+  if (which === "weeks") restoreChecks();
+  if (which === "done") renderDone();
+  if (isAdmin) renderAdmin();
+  window.scrollTo({ top: 0 });
+}
+
+// ============ STEP 1 → 2 ============
+function continueToWeeks() {
+  const name = document.getElementById("familyName").value.trim();
+  if (!name) { alert("Please enter your family name first."); return; }
+  saveMyResponse({ name });
+  document.getElementById("weeksHeading").textContent = `Which weeks work for ${name}?`;
+  showView("weeks");
+}
+
+// ============ STEP 2: WEEKS ============
+function renderWeekList() {
   const container = document.getElementById("weekList");
   let html = "", currentMonth = -1;
   WEEKS.forEach((w, i) => {
@@ -264,6 +342,12 @@ function renderPoll() {
 function onCheck(cb) {
   cb.closest(".week").classList.toggle("checked", cb.checked);
   updateCount();
+  // auto-save selections so families can leave and come back
+  saveMyResponse({ indices: currentIndices() });
+}
+
+function currentIndices() {
+  return Array.from(document.querySelectorAll("#weekList input:checked"), cb => +cb.dataset.idx);
 }
 
 function setAll(state) {
@@ -271,6 +355,19 @@ function setAll(state) {
     cb.checked = state;
     cb.closest(".week").classList.toggle("checked", state);
   });
+  updateCount();
+  saveMyResponse({ indices: currentIndices() });
+}
+
+function restoreChecks() {
+  const mine = myResponse();
+  const set = new Set(mine.indices || []);
+  document.querySelectorAll("#weekList input[type=checkbox]").forEach(cb => {
+    const on = set.has(+cb.dataset.idx);
+    cb.checked = on;
+    cb.closest(".week").classList.toggle("checked", on);
+  });
+  if (mine.name) document.getElementById("weeksHeading").textContent = `Which weeks work for ${mine.name}?`;
   updateCount();
 }
 
@@ -280,7 +377,7 @@ function updateCount() {
 }
 
 // ============ ENCODING ============
-// Selections are a bitmask over WEEKS, hex-encoded: F27:<urlencoded name>:<hex>
+// Selections are a bitmask over WEEKS, hex-encoded: F27S:<urlencoded name>:<hex>
 function encodeResponse(name, indices) {
   const bytes = new Uint8Array(Math.ceil(WEEKS.length / 8));
   indices.forEach(i => { bytes[i >> 3] |= 1 << (i & 7); });
@@ -303,35 +400,44 @@ function decodeResponse(code) {
   return { name, indices };
 }
 
-let lastCode = "";
-
+// ============ STEP 3: SUBMIT / DONE ============
 function submitPoll() {
-  const name = document.getElementById("familyName").value.trim();
-  if (!name) { alert("Please enter your family name first."); return; }
-  const indices = Array.from(document.querySelectorAll("#weekList input:checked"), cb => +cb.dataset.idx);
+  const indices = currentIndices();
   if (indices.length === 0 && !confirm("You haven't checked any weeks — submit as 'no weeks work for us'?")) return;
-
-  lastCode = encodeResponse(name, indices);
-  document.getElementById("responseCode").textContent = lastCode;
-  const box = document.getElementById("submitResult");
-  box.classList.remove("hidden");
-  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  saveMyResponse({ indices, submitted: true });
+  showView("done");
 }
 
-function emailResponse() {
-  const name = decodeResponse(lastCode).name;
-  const subject = encodeURIComponent(`2027 Week Poll — ${name}`);
-  const body = encodeURIComponent(`Here is our availability response code:\n\n${lastCode}\n`);
-  window.location.href = `mailto:${ORGANIZER_EMAIL}?subject=${subject}&body=${body}`;
+function renderDone() {
+  const mine = myResponse();
+  const code = encodeResponse(mine.name, mine.indices || []);
+  document.getElementById("responseCode").textContent = code;
+  document.getElementById("doneHeading").textContent = `✅ Thanks, ${mine.name}!`;
+  document.getElementById("pickedList").innerHTML = (mine.indices || []).length
+    ? mine.indices.map(i => `<li>${fmtLong.format(WEEKS[i])}</li>`).join("")
+    : "<li>No weeks selected.</li>";
+}
+
+function myCode() {
+  const mine = myResponse();
+  return encodeResponse(mine.name, mine.indices || []);
 }
 
 function shareLink() {
+  const code = myCode();
   return location.origin && location.origin !== "null"
-    ? location.origin + location.pathname + "#r=" + lastCode
-    : "#r=" + lastCode;
+    ? location.origin + location.pathname + "#r=" + code
+    : code;
 }
 
-function copyShareLink(btn) { copyText(shareLink(), btn); }
+function emailResponse() {
+  const mine = myResponse();
+  const subject = encodeURIComponent(`Summer 2027 Week Poll — ${mine.name}`);
+  const link = shareLink();
+  const body = encodeURIComponent(
+    `Here is our availability for summer 2027!\n\nResponse link (just open it):\n${link}\n\nResponse code:\n${myCode()}\n`);
+  window.location.href = `mailto:${ORGANIZER_EMAIL}?subject=${subject}&body=${body}`;
+}
 
 function copyText(text, btn) {
   const done = () => {
@@ -355,29 +461,31 @@ function fallbackCopy(text, done) {
   document.body.removeChild(ta);
 }
 
-// ============ RESULTS VIEW ============
+// ============ ADMIN ============
 function loadResponses() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  try { return JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY)) || []; }
   catch { return []; }
 }
 function saveResponses(list) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(list));
+}
+function upsertResponse(list, parsed) {
+  const existing = list.findIndex(r => r.name.toLowerCase() === parsed.name.toLowerCase());
+  if (existing >= 0) { list[existing] = parsed; return "updated"; }
+  list.push(parsed); return "added";
 }
 
 function importCodes() {
   const lines = document.getElementById("codeInput").value.split("\n").map(s => s.trim()).filter(Boolean);
   const msg = document.getElementById("importMsg");
-  if (!lines.length) { msg.textContent = "Nothing to add — paste at least one code."; return; }
+  if (!lines.length) { msg.textContent = "Nothing to add — paste at least one code or link."; return; }
   const list = loadResponses();
   let added = 0, updated = 0, bad = 0;
   lines.forEach(line => {
-    // also accept a pasted share link containing #r=
-    const m = line.match(/#r=(.+)$/);
+    const m = line.match(/#r=(.+)$/);          // accept pasted response links too
     const parsed = decodeResponse(m ? m[1] : line);
     if (!parsed) { bad++; return; }
-    const existing = list.findIndex(r => r.name.toLowerCase() === parsed.name.toLowerCase());
-    if (existing >= 0) { list[existing] = parsed; updated++; }
-    else { list.push(parsed); added++; }
+    upsertResponse(list, parsed) === "added" ? added++ : updated++;
   });
   saveResponses(list);
   document.getElementById("codeInput").value = "";
@@ -386,23 +494,23 @@ function importCodes() {
     updated && `${updated} updated`,
     bad && `${bad} not recognized`
   ].filter(Boolean).join(", ") || "";
-  renderResults();
+  renderAdmin();
 }
 
 function removeResponse(idx) {
   const list = loadResponses();
   list.splice(idx, 1);
   saveResponses(list);
-  renderResults();
+  renderAdmin();
 }
 
 function clearResponses() {
   if (!confirm("Remove ALL family responses saved in this browser?")) return;
   saveResponses([]);
-  renderResults();
+  renderAdmin();
 }
 
-function renderResults() {
+function renderAdmin() {
   const list = loadResponses();
   const n = list.length;
   document.getElementById("famCount").textContent = n;
@@ -411,24 +519,21 @@ function renderResults() {
     ? list.map((r, i) =>
         `<span class="chip">${escapeHtml(r.name)} (${r.indices.length} wk)
           <button title="Remove" onclick="removeResponse(${i})">✕</button></span>`).join("")
-    : `<span class="hint">No responses yet.</span>`;
+    : `<span class="hint">No responses yet — they'll appear here as families send them in.</span>`;
 
-  // counts per week
   const counts = WEEKS.map((_, i) => list.filter(r => r.indices.includes(i)));
   let order = WEEKS.map((_, i) => i);
   if (document.getElementById("sortByCount").checked) {
     order.sort((a, b) => counts[b].length - counts[a].length || a - b);
   }
 
-  // banner: mutually available weeks
   const banner = document.getElementById("bestBanner");
   if (n > 0) {
     const allWeeks = WEEKS.map((w, i) => ({ w, i })).filter(x => counts[x.i].length === n);
     banner.innerHTML = allWeeks.length
-      ? `<div class="best-banner">🎉 <strong>${allWeeks.length} week${allWeeks.length === 1 ? "" : "s"} work for ALL ${n} famil${n === 1 ? "y" : "ies"}:</strong>
-         ${allWeeks.map(x => fmtShort.format(x.w)).join(" · ")}</div>`
-      : `<div class="best-banner" style="background:var(--warn-soft);border-color:var(--warn)">
-         😕 No single week works for all ${n} families yet. Sort by most available to see the closest options.</div>`;
+      ? `<div class="banner-ok">🎉 <strong>${allWeeks.length} week${allWeeks.length === 1 ? "" : "s"} work for ALL ${n} famil${n === 1 ? "y" : "ies"}:</strong>
+         ${allWeeks.map(x => "week of " + fmtShort.format(x.w)).join(" · ")}</div>`
+      : `<div class="banner-warn">😕 No single week works for all ${n} families yet. Sort by most available to see the closest options.</div>`;
   } else {
     banner.innerHTML = "";
   }
@@ -454,30 +559,32 @@ function escapeHtml(s) {
   return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-// ============ TABS & INIT ============
-function showTab(which) {
-  const poll = which === "poll";
-  document.getElementById("pollView").classList.toggle("hidden", !poll);
-  document.getElementById("resultsView").classList.toggle("hidden", poll);
-  document.getElementById("tabPoll").classList.toggle("active", poll);
-  document.getElementById("tabResults").classList.toggle("active", !poll);
-  if (!poll) renderResults();
-}
+// ============ INIT ============
+renderWeekList();
 
-renderPoll();
-
-// If opened via a share link (#r=CODE), auto-import that response into results.
-(function handleShareLink() {
+(function init() {
+  // Organizer opening a family's response link: import it and show the dashboard.
   const m = location.hash.match(/^#r=(.+)$/);
-  if (!m) return;
-  const parsed = decodeResponse(decodeURIComponent(m[1]).startsWith(CODE_PREFIX) ? decodeURIComponent(m[1]) : m[1]);
-  if (!parsed) return;
-  const list = loadResponses();
-  const existing = list.findIndex(r => r.name.toLowerCase() === parsed.name.toLowerCase());
-  if (existing >= 0) list[existing] = parsed; else list.push(parsed);
-  saveResponses(list);
-  history.replaceState(null, "", location.pathname + location.search);
-  showTab("results");
+  if (m) {
+    const raw = decodeURIComponent(m[1]).startsWith(CODE_PREFIX) ? decodeURIComponent(m[1]) : m[1];
+    const parsed = decodeResponse(raw);
+    if (parsed) {
+      const list = loadResponses();
+      upsertResponse(list, parsed);
+      saveResponses(list);
+      history.replaceState(null, "", location.pathname + location.search);
+      showView("admin");
+      return;
+    }
+  }
+  if (location.hash === "#admin") { showView("admin"); return; }
+
+  // Returning family: pick up where they left off.
+  const mine = myResponse();
+  if (mine.name) document.getElementById("familyName").value = mine.name;
+  if (mine.submitted) showView("done");
+  else if (mine.name) showView("weeks");
+  else showView("name");
 })();
 </script>
 </body>
