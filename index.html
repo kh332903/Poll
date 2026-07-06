@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2027 Family Week Poll</title>
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --ink: #1f2430;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --good: #16a34a;
+    --good-soft: #dcfce7;
+    --warn: #d97706;
+    --warn-soft: #fef3c7;
+    --bad-soft: #f3f4f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111318;
+      --card: #1b1e26;
+      --ink: #e8eaf0;
+      --muted: #9aa1ad;
+      --line: #2b2f3a;
+      --accent: #60a5fa;
+      --accent-soft: #1e3a5f;
+      --good: #4ade80;
+      --good-soft: #14372a;
+      --warn: #fbbf24;
+      --warn-soft: #3d3018;
+      --bad-soft: #23262e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  header p { margin: 0 0 20px; color: var(--muted); }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab {
+    padding: 10px 18px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--card); color: var(--ink); font-size: 1rem; cursor: pointer;
+  }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px; margin-bottom: 20px;
+  }
+  .card h2 { margin: 0 0 12px; font-size: 1.15rem; }
+
+  label.field-label { display: block; font-weight: 600; margin-bottom: 6px; }
+  input[type="text"], textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg); color: var(--ink); font-size: 1rem; font-family: inherit;
+  }
+  textarea { min-height: 90px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85rem; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+  .toolbar .count { margin-left: auto; color: var(--muted); font-size: .9rem; }
+
+  button.btn {
+    padding: 9px 16px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--card); color: var(--ink); font-size: .95rem; cursor: pointer;
+  }
+  button.btn:hover { border-color: var(--accent); }
+  button.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  button.btn.danger { color: #dc2626; }
+
+  .month-group { margin-bottom: 4px; }
+  .month-group h3 {
+    font-size: .8rem; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); margin: 16px 0 8px;
+  }
+  .weeks { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+  .week {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 10px; cursor: pointer;
+    background: var(--bg); user-select: none;
+  }
+  .week:hover { border-color: var(--accent); }
+  .week input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .week.checked { background: var(--accent-soft); border-color: var(--accent); }
+  .week .wk-label { font-size: .93rem; }
+
+  .result-box {
+    background: var(--bg); border: 1px dashed var(--accent); border-radius: 10px;
+    padding: 14px; margin-top: 14px;
+  }
+  .code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .85rem; word-break: break-all; background: var(--card);
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin: 8px 0;
+  }
+  .hidden { display: none; }
+  .hint { color: var(--muted); font-size: .88rem; }
+
+  /* Results */
+  .fam-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px;
+    background: var(--accent-soft); border-radius: 999px; font-size: .9rem;
+  }
+  .chip button { border: none; background: none; color: inherit; cursor: pointer; font-size: 1rem; padding: 0; line-height: 1; }
+
+  table { width: 100%; border-collapse: collapse; }
+  .table-scroll { overflow-x: auto; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: .92rem; }
+  th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+  tr.all-avail td { background: var(--good-soft); }
+  tr.most-avail td { background: var(--warn-soft); }
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600;
+  }
+  .badge.all { background: var(--good); color: #fff; }
+  .badge.most { background: var(--warn); color: #fff; }
+  .badge.some { background: var(--bad-soft); color: var(--muted); }
+  .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; min-width: 80px; }
+  .bar > div { height: 100%; background: var(--accent); }
+  .best-banner {
+    padding: 14px 16px; border-radius: 10px; background: var(--good-soft);
+    border: 1px solid var(--good); margin-bottom: 16px; font-size: .95rem;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🗓️ 2027 Family Week Poll</h1>
+    <p>Pick every week in 2027 that works for your family, then submit. We'll find the weeks that work for everyone.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" id="tabPoll" onclick="showTab('poll')">✅ Fill Out Poll</button>
+    <button class="tab" id="tabResults" onclick="showTab('results')">📊 View Results</button>
+  </div>
+
+  <!-- ===================== POLL VIEW ===================== -->
+  <section id="pollView">
+    <div class="card">
+      <label class="field-label" for="familyName">Your family name</label>
+      <input type="text" id="familyName" placeholder="e.g. The Hannas" maxlength="40">
+    </div>
+
+    <div class="card">
+      <h2>Which weeks work for you?</h2>
+      <p class="hint">Each option is a full week starting on the Monday shown.</p>
+      <div class="toolbar">
+        <button class="btn" onclick="setAll(true)">Select all</button>
+        <button class="btn" onclick="setAll(false)">Clear all</button>
+        <span class="count" id="checkedCount">0 weeks selected</span>
+      </div>
+      <div id="weekList"></div>
+    </div>
+
+    <div class="card">
+      <button class="btn primary" onclick="submitPoll()">Submit my availability</button>
+      <div class="result-box hidden" id="submitResult">
+        <strong>✅ Thanks! One last step — send this back to the organizer.</strong>
+        <p class="hint">Your availability is packed into the code below. Use one of the buttons, or just copy the code into any message.</p>
+        <div class="code" id="responseCode"></div>
+        <div class="toolbar">
+          <button class="btn primary" onclick="emailResponse()">📧 Email it</button>
+          <button class="btn" onclick="copyText(document.getElementById('responseCode').textContent, this)">📋 Copy code</button>
+          <button class="btn" onclick="copyShareLink(this)">🔗 Copy results link</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RESULTS VIEW ===================== -->
+  <section id="resultsView" class="hidden">
+    <div class="card">
+      <h2>Add family responses</h2>
+      <p class="hint">Paste the response codes families sent you — one per line — then click Add. Responses are saved in this browser.</p>
+      <textarea id="codeInput" placeholder="F27:The%20Hannas:0f00c0000001aa"></textarea>
+      <div class="toolbar">
+        <button class="btn primary" onclick="importCodes()">Add responses</button>
+        <button class="btn danger" onclick="clearResponses()">Clear all responses</button>
+      </div>
+      <div id="importMsg" class="hint"></div>
+    </div>
+
+    <div class="card">
+      <h2>Families responded: <span id="famCount">0</span> / 10</h2>
+      <div class="fam-chips" id="famChips"></div>
+    </div>
+
+    <div class="card">
+      <h2>Week-by-week availability</h2>
+      <div id="bestBanner"></div>
+      <div class="toolbar">
+        <label><input type="checkbox" id="sortByCount" onchange="renderResults()"> Sort by most available</label>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Week of</th><th>Available</th><th></th><th>Families</th></tr>
+          </thead>
+          <tbody id="resultRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+
+// ============ CONFIG ============
+const ORGANIZER_EMAIL = "kylehanna33@gmail.com"; // where families email their response codes
+const YEAR = 2027;
+const CODE_PREFIX = "F27";
+const STORAGE_KEY = "familyPollResponses2027";
+
+// ============ WEEK GENERATION ============
+// All Mondays in 2027.
+function buildWeeks() {
+  const weeks = [];
+  const d = new Date(YEAR, 0, 1);
+  while (d.getDay() !== 1) d.setDate(d.getDate() + 1); // advance to first Monday
+  while (d.getFullYear() === YEAR) {
+    weeks.push(new Date(d));
+    d.setDate(d.getDate() + 7);
+  }
+  return weeks;
+}
+const WEEKS = buildWeeks();
+
+const fmtLong = new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+const fmtShort = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric" });
+const fmtMonth = new Intl.DateTimeFormat("en-US", { month: "long" });
+
+// ============ POLL VIEW ============
+function renderPoll() {
+  const container = document.getElementById("weekList");
+  let html = "", currentMonth = -1;
+  WEEKS.forEach((w, i) => {
+    if (w.getMonth() !== currentMonth) {
+      if (currentMonth !== -1) html += "</div></div>";
+      currentMonth = w.getMonth();
+      html += `<div class="month-group"><h3>${fmtMonth.format(w)} ${YEAR}</h3><div class="weeks">`;
+    }
+    html += `<label class="week" id="wk${i}">
+      <input type="checkbox" data-idx="${i}" onchange="onCheck(this)">
+      <span class="wk-label">${fmtLong.format(w)}</span>
+    </label>`;
+  });
+  html += "</div></div>";
+  container.innerHTML = html;
+}
+
+function onCheck(cb) {
+  cb.closest(".week").classList.toggle("checked", cb.checked);
+  updateCount();
+}
+
+function setAll(state) {
+  document.querySelectorAll("#weekList input[type=checkbox]").forEach(cb => {
+    cb.checked = state;
+    cb.closest(".week").classList.toggle("checked", state);
+  });
+  updateCount();
+}
+
+function updateCount() {
+  const n = document.querySelectorAll("#weekList input:checked").length;
+  document.getElementById("checkedCount").textContent = `${n} week${n === 1 ? "" : "s"} selected`;
+}
+
+// ============ ENCODING ============
+// Selections are a bitmask over WEEKS, hex-encoded: F27:<urlencoded name>:<hex>
+function encodeResponse(name, indices) {
+  const bytes = new Uint8Array(Math.ceil(WEEKS.length / 8));
+  indices.forEach(i => { bytes[i >> 3] |= 1 << (i & 7); });
+  const hex = Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+  return `${CODE_PREFIX}:${encodeURIComponent(name)}:${hex}`;
+}
+
+function decodeResponse(code) {
+  const parts = code.trim().split(":");
+  if (parts.length !== 3 || parts[0] !== CODE_PREFIX) return null;
+  let name;
+  try { name = decodeURIComponent(parts[1]).trim(); } catch { return null; }
+  if (!name || !/^[0-9a-fA-F]+$/.test(parts[2])) return null;
+  const indices = [];
+  const hex = parts[2];
+  for (let i = 0; i < WEEKS.length; i++) {
+    const byte = parseInt(hex.substr((i >> 3) * 2, 2) || "0", 16);
+    if (byte & (1 << (i & 7))) indices.push(i);
+  }
+  return { name, indices };
+}
+
+let lastCode = "";
+
+function submitPoll() {
+  const name = document.getElementById("familyName").value.trim();
+  if (!name) { alert("Please enter your family name first."); return; }
+  const indices = Array.from(document.querySelectorAll("#weekList input:checked"), cb => +cb.dataset.idx);
+  if (indices.length === 0 && !confirm("You haven't checked any weeks — submit as 'no weeks work for us'?")) return;
+
+  lastCode = encodeResponse(name, indices);
+  document.getElementById("responseCode").textContent = lastCode;
+  const box = document.getElementById("submitResult");
+  box.classList.remove("hidden");
+  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function emailResponse() {
+  const name = decodeResponse(lastCode).name;
+  const subject = encodeURIComponent(`2027 Week Poll — ${name}`);
+  const body = encodeURIComponent(`Here is our availability response code:\n\n${lastCode}\n`);
+  window.location.href = `mailto:${ORGANIZER_EMAIL}?subject=${subject}&body=${body}`;
+}
+
+function shareLink() {
+  return location.origin && location.origin !== "null"
+    ? location.origin + location.pathname + "#r=" + lastCode
+    : "#r=" + lastCode;
+}
+
+function copyShareLink(btn) { copyText(shareLink(), btn); }
+
+function copyText(text, btn) {
+  const done = () => {
+    if (!btn) return;
+    const old = btn.textContent;
+    btn.textContent = "✅ Copied!";
+    setTimeout(() => { btn.textContent = old; }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); done(); } catch {}
+  document.body.removeChild(ta);
+}
+
+// ============ RESULTS VIEW ============
+function loadResponses() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+function saveResponses(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function importCodes() {
+  const lines = document.getElementById("codeInput").value.split("\n").map(s => s.trim()).filter(Boolean);
+  const msg = document.getElementById("importMsg");
+  if (!lines.length) { msg.textContent = "Nothing to add — paste at least one code."; return; }
+  const list = loadResponses();
+  let added = 0, updated = 0, bad = 0;
+  lines.forEach(line => {
+    // also accept a pasted share link containing #r=
+    const m = line.match(/#r=(.+)$/);
+    const parsed = decodeResponse(m ? m[1] : line);
+    if (!parsed) { bad++; return; }
+    const existing = list.findIndex(r => r.name.toLowerCase() === parsed.name.toLowerCase());
+    if (existing >= 0) { list[existing] = parsed; updated++; }
+    else { list.push(parsed); added++; }
+  });
+  saveResponses(list);
+  document.getElementById("codeInput").value = "";
+  msg.textContent = [
+    added && `${added} added`,
+    updated && `${updated} updated`,
+    bad && `${bad} not recognized`
+  ].filter(Boolean).join(", ") || "";
+  renderResults();
+}
+
+function removeResponse(idx) {
+  const list = loadResponses();
+  list.splice(idx, 1);
+  saveResponses(list);
+  renderResults();
+}
+
+function clearResponses() {
+  if (!confirm("Remove ALL family responses saved in this browser?")) return;
+  saveResponses([]);
+  renderResults();
+}
+
+function renderResults() {
+  const list = loadResponses();
+  const n = list.length;
+  document.getElementById("famCount").textContent = n;
+
+  document.getElementById("famChips").innerHTML = n
+    ? list.map((r, i) =>
+        `<span class="chip">${escapeHtml(r.name)} (${r.indices.length} wk)
+          <button title="Remove" onclick="removeResponse(${i})">✕</button></span>`).join("")
+    : `<span class="hint">No responses yet.</span>`;
+
+  // counts per week
+  const counts = WEEKS.map((_, i) => list.filter(r => r.indices.includes(i)));
+  let order = WEEKS.map((_, i) => i);
+  if (document.getElementById("sortByCount").checked) {
+    order.sort((a, b) => counts[b].length - counts[a].length || a - b);
+  }
+
+  // banner: mutually available weeks
+  const banner = document.getElementById("bestBanner");
+  if (n > 0) {
+    const allWeeks = WEEKS.map((w, i) => ({ w, i })).filter(x => counts[x.i].length === n);
+    banner.innerHTML = allWeeks.length
+      ? `<div class="best-banner">🎉 <strong>${allWeeks.length} week${allWeeks.length === 1 ? "" : "s"} work for ALL ${n} famil${n === 1 ? "y" : "ies"}:</strong>
+         ${allWeeks.map(x => fmtShort.format(x.w)).join(" · ")}</div>`
+      : `<div class="best-banner" style="background:var(--warn-soft);border-color:var(--warn)">
+         😕 No single week works for all ${n} families yet. Sort by most available to see the closest options.</div>`;
+  } else {
+    banner.innerHTML = "";
+  }
+
+  document.getElementById("resultRows").innerHTML = order.map(i => {
+    const fams = counts[i];
+    const pct = n ? Math.round(fams.length / n * 100) : 0;
+    const cls = n && fams.length === n ? "all-avail" : (n && fams.length >= n - 1 && fams.length > 0 ? "most-avail" : "");
+    const badge = n === 0 ? "" :
+      fams.length === n ? `<span class="badge all">All ${n}</span>` :
+      fams.length >= n - 1 && fams.length > 0 ? `<span class="badge most">${fams.length}/${n}</span>` :
+      `<span class="badge some">${fams.length}/${n}</span>`;
+    return `<tr class="${cls}">
+      <td>${fmtLong.format(WEEKS[i])}</td>
+      <td>${badge}</td>
+      <td><div class="bar"><div style="width:${pct}%"></div></div></td>
+      <td class="hint">${fams.map(r => escapeHtml(r.name)).join(", ") || "—"}</td>
+    </tr>`;
+  }).join("");
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// ============ TABS & INIT ============
+function showTab(which) {
+  const poll = which === "poll";
+  document.getElementById("pollView").classList.toggle("hidden", !poll);
+  document.getElementById("resultsView").classList.toggle("hidden", poll);
+  document.getElementById("tabPoll").classList.toggle("active", poll);
+  document.getElementById("tabResults").classList.toggle("active", !poll);
+  if (!poll) renderResults();
+}
+
+renderPoll();
+
+// If opened via a share link (#r=CODE), auto-import that response into results.
+(function handleShareLink() {
+  const m = location.hash.match(/^#r=(.+)$/);
+  if (!m) return;
+  const parsed = decodeResponse(decodeURIComponent(m[1]).startsWith(CODE_PREFIX) ? decodeURIComponent(m[1]) : m[1]);
+  if (!parsed) return;
+  const list = loadResponses();
+  const existing = list.findIndex(r => r.name.toLowerCase() === parsed.name.toLowerCase());
+  if (existing >= 0) list[existing] = parsed; else list.push(parsed);
+  saveResponses(list);
+  history.replaceState(null, "", location.pathname + location.search);
+  showTab("results");
+})();
+</script>
+</body>
+</html>
